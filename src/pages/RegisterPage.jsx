@@ -1,17 +1,15 @@
 /**
  * RegisterPage.jsx
  *
- * Handles new user registration.
- * - POSTs { name, email, password, role } to POST /api/auth/register.
- * - Role is chosen from a dropdown (CANDIDATE / RECRUITER).
- * - On success, calls auth.login() and redirects based on role.
- * - Shows server-side error messages (e.g. email already registered).
+ * Registration page with interactive visual role selection
+ * (Candidate vs Recruiter), input validation, and sleek glass styling.
  */
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import api from '../api/api'
 import { useAuth } from '../context/AuthContext'
+import { BriefcaseIcon, UserIcon, BuildingIcon, ArrowRightIcon } from '../components/Icons'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -31,15 +29,20 @@ export default function RegisterPage() {
     setError('')
   }
 
+  function handleRoleSelect(role) {
+    setForm({ ...form, role })
+    setError('')
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
 
     if (!form.name || !form.email || !form.password) {
-      setError('Please fill in all fields.')
+      setError('Please fill in all required fields.')
       return
     }
     if (form.password.length < 6) {
-      setError('Password must be at least 6 characters.')
+      setError('Password must contain at least 6 characters.')
       return
     }
 
@@ -47,7 +50,7 @@ export default function RegisterPage() {
       setLoading(true)
       const response = await api.post('/auth/register', form)
       auth.login(response.data)
-      toast.success(`Account created! Welcome, ${response.data.name}!`)
+      toast.success(`Account created! Welcome, ${response.data.name}! 🚀`)
 
       if (response.data.role === 'RECRUITER') {
         navigate('/recruiter/jobs')
@@ -55,7 +58,7 @@ export default function RegisterPage() {
         navigate('/jobs')
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed. Please try again.'
+      const msg = err.response?.data?.message || 'Registration failed. Please check your details.'
       setError(msg)
       toast.error(msg)
     } finally {
@@ -66,10 +69,46 @@ export default function RegisterPage() {
   return (
     <div className="auth-wrapper">
       <div className="auth-card animate-in">
-        <h1>Create Account 🚀</h1>
-        <p className="subtitle">Join JobPortal — free forever.</p>
+        {/* Brand Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.5rem' }}>
+          <div className="navbar-logo-icon">
+            <BriefcaseIcon size={18} />
+          </div>
+          <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em' }}>JobPortal</span>
+        </div>
+
+        <h1>Create Your Account</h1>
+        <p className="subtitle">Join thousands of job seekers and hiring teams.</p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          {/* Interactive Role Selection */}
+          <div>
+            <label className="form-label mb-2" style={{ display: 'block' }}>I want to use JobPortal as a…</label>
+            <div className="role-selector">
+              <div
+                className={`role-option ${form.role === 'CANDIDATE' ? 'selected' : ''}`}
+                onClick={() => handleRoleSelect('CANDIDATE')}
+              >
+                <div style={{ color: form.role === 'CANDIDATE' ? '#818cf8' : 'var(--text-muted)', display: 'flex', justifyContent: 'center' }}>
+                  <UserIcon size={22} />
+                </div>
+                <div className="role-option-title">Candidate</div>
+                <div className="role-option-desc">Looking for opportunities</div>
+              </div>
+
+              <div
+                className={`role-option ${form.role === 'RECRUITER' ? 'selected' : ''}`}
+                onClick={() => handleRoleSelect('RECRUITER')}
+              >
+                <div style={{ color: form.role === 'RECRUITER' ? '#818cf8' : 'var(--text-muted)', display: 'flex', justifyContent: 'center' }}>
+                  <BuildingIcon size={22} />
+                </div>
+                <div className="role-option-title">Recruiter</div>
+                <div className="role-option-desc">Hiring top talent</div>
+              </div>
+            </div>
+          </div>
+
           <div className="form-group">
             <label className="form-label" htmlFor="name">Full Name</label>
             <input
@@ -77,7 +116,7 @@ export default function RegisterPage() {
               className="form-input"
               type="text"
               name="name"
-              placeholder="John Doe"
+              placeholder="e.g. Alex Morgan"
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
@@ -92,7 +131,7 @@ export default function RegisterPage() {
               className="form-input"
               type="email"
               name="email"
-              placeholder="you@example.com"
+              placeholder="name@example.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
@@ -115,34 +154,33 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="role">I am a…</label>
-            <select
-              id="role"
-              className="form-select"
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-            >
-              <option value="CANDIDATE">👤 Candidate — looking for a job</option>
-              <option value="RECRUITER">🏢 Recruiter — posting jobs</option>
-            </select>
-          </div>
-
-          {error && <p className="form-error">{error}</p>}
+          {error && (
+            <div className="form-error" style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '0.65rem 0.9rem', borderRadius: 8, border: '1px solid rgba(239, 68, 68, 0.25)' }}>
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
 
           <button
             id="register-submit"
-            className="btn btn-primary btn-full"
+            className="btn btn-primary btn-full btn-lg"
             type="submit"
             disabled={loading}
+            style={{ marginTop: '0.5rem' }}
           >
-            {loading ? 'Creating account…' : 'Create Account →'}
+            {loading ? (
+              'Creating Account…'
+            ) : (
+              <>
+                Create Free Account <ArrowRightIcon size={16} />
+              </>
+            )}
           </button>
         </form>
 
         <p className="auth-footer">
-          Already have an account? <Link to="/login">Log in here</Link>
+          Already registered?{' '}
+          <Link to="/login">Sign in here</Link>
         </p>
       </div>
     </div>

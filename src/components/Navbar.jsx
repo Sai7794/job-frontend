@@ -2,15 +2,16 @@
  * Navbar.jsx
  *
  * Sticky top navigation bar.
- * - Shows brand logo/name on the left.
+ * - Shows brand logo/name on the left with custom gradient icon.
  * - Shows relevant links based on authentication state and user role.
  * - Candidate links: Browse Jobs, My Applications
  * - Recruiter links: My Jobs, Post Job
  * - Unauthenticated links: Login, Register
- * - Always shows: the user's name and a Logout button when logged in.
+ * - User pill with role badge and logout button.
  */
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { BriefcaseIcon, UserIcon, BuildingIcon, PlusIcon, LogoutIcon } from './Icons'
 
 export default function Navbar() {
   const { isLoggedIn, user, logout, isCandidate, isRecruiter } = useAuth()
@@ -20,7 +21,10 @@ export default function Navbar() {
       <div className="container navbar-inner">
         {/* Brand */}
         <NavLink to="/" className="navbar-brand">
-          ⚡ JobPortal
+          <div className="navbar-logo-icon">
+            <BriefcaseIcon size={18} />
+          </div>
+          <span>JobPortal</span>
         </NavLink>
 
         {/* Navigation links */}
@@ -58,21 +62,39 @@ export default function Navbar() {
                     to="/recruiter/jobs/new"
                     className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                   >
-                    Post a Job
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <PlusIcon size={14} /> Post a Job
+                    </span>
                   </NavLink>
                 </>
               )}
 
-              {/* User info + logout */}
-              <span className="pill" style={{ marginLeft: '0.5rem' }}>
-                {user?.role === 'RECRUITER' ? '🏢' : '👤'} {user?.name}
-              </span>
-              <button className="btn btn-secondary btn-sm" onClick={logout}>
-                Logout
+              {/* User info + role chip */}
+              <div className="user-badge">
+                {user?.role === 'RECRUITER' ? (
+                  <BuildingIcon size={14} className="text-muted" />
+                ) : (
+                  <UserIcon size={14} className="text-muted" />
+                )}
+                <span>{user?.name}</span>
+                <span className={`badge ${user?.role === 'RECRUITER' ? 'badge-purple' : 'badge-blue'}`} style={{ fontSize: '0.68rem', padding: '0.1rem 0.5rem' }}>
+                  {user?.role}
+                </span>
+              </div>
+
+              <button className="btn btn-secondary btn-sm" onClick={logout} title="Log out">
+                <LogoutIcon size={14} />
+                <span>Logout</span>
               </button>
             </>
           ) : (
             <>
+              <NavLink
+                to="/jobs"
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              >
+                Browse Jobs
+              </NavLink>
               <NavLink
                 to="/login"
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
@@ -80,7 +102,9 @@ export default function Navbar() {
                 Login
               </NavLink>
               <NavLink to="/register">
-                <button className="btn btn-primary btn-sm">Register</button>
+                <button className="btn btn-primary btn-sm">
+                  Get Started →
+                </button>
               </NavLink>
             </>
           )}

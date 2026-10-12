@@ -9,6 +9,7 @@
  *   - submitLabel : string (button label)
  */
 import { useState } from 'react'
+import { PlusIcon } from './Icons'
 
 export default function JobForm({ initialData = {}, onSubmit, loading, submitLabel = 'Submit' }) {
   const [form, setForm] = useState({
@@ -31,7 +32,7 @@ export default function JobForm({ initialData = {}, onSubmit, loading, submitLab
     const e = {}
     if (!form.title.trim())       e.title       = 'Job title is required.'
     if (!form.companyName.trim()) e.companyName = 'Company name is required.'
-    if (!form.description.trim()) e.description = 'Description is required.'
+    if (!form.description.trim()) e.description = 'Job description is required.'
     return e
   }
 
@@ -55,11 +56,11 @@ export default function JobForm({ initialData = {}, onSubmit, loading, submitLab
             id="jf-title"
             className="form-input"
             name="title"
-            placeholder="e.g. Software Engineer"
+            placeholder="e.g. Senior Full Stack Engineer"
             value={form.title}
             onChange={handleChange}
           />
-          {errors.title && <span className="form-error">{errors.title}</span>}
+          {errors.title && <span className="form-error">⚠️ {errors.title}</span>}
         </div>
         <div className="form-group">
           <label className="form-label" htmlFor="jf-company">Company Name *</label>
@@ -67,34 +68,34 @@ export default function JobForm({ initialData = {}, onSubmit, loading, submitLab
             id="jf-company"
             className="form-input"
             name="companyName"
-            placeholder="e.g. Google"
+            placeholder="e.g. Acme Technologies"
             value={form.companyName}
             onChange={handleChange}
           />
-          {errors.companyName && <span className="form-error">{errors.companyName}</span>}
+          {errors.companyName && <span className="form-error">⚠️ {errors.companyName}</span>}
         </div>
       </div>
 
       <div className="grid-2" style={{ marginBottom: '1.25rem' }}>
         <div className="form-group">
-          <label className="form-label" htmlFor="jf-location">Location</label>
+          <label className="form-label" htmlFor="jf-location">Location / Work Style</label>
           <input
             id="jf-location"
             className="form-input"
             name="location"
-            placeholder="e.g. Bengaluru / Remote"
+            placeholder="e.g. Remote / Bengaluru / Hybrid"
             value={form.location}
             onChange={handleChange}
           />
         </div>
         <div className="form-group">
-          <label className="form-label" htmlFor="jf-salary">Annual Salary (₹)</label>
+          <label className="form-label" htmlFor="jf-salary">Annual Compensation (₹)</label>
           <input
             id="jf-salary"
             className="form-input"
             type="number"
             name="salary"
-            placeholder="e.g. 1200000"
+            placeholder="e.g. 1500000"
             value={form.salary}
             onChange={handleChange}
             min="0"
@@ -110,19 +111,19 @@ export default function JobForm({ initialData = {}, onSubmit, loading, submitLab
             className="form-input"
             type="number"
             name="experience"
-            placeholder="e.g. 2"
+            placeholder="e.g. 3"
             value={form.experience}
             onChange={handleChange}
             min="0"
           />
         </div>
         <div className="form-group">
-          <label className="form-label" htmlFor="jf-skills">Required Skills</label>
+          <label className="form-label" htmlFor="jf-skills">Required Technologies</label>
           <input
             id="jf-skills"
             className="form-input"
             name="requiredSkills"
-            placeholder="Java, React, MySQL (comma-separated)"
+            placeholder="React, Java, PostgreSQL, Docker (comma-separated)"
             value={form.requiredSkills}
             onChange={handleChange}
           />
@@ -130,21 +131,28 @@ export default function JobForm({ initialData = {}, onSubmit, loading, submitLab
       </div>
 
       <div className="form-group" style={{ marginBottom: '1.75rem' }}>
-        <label className="form-label" htmlFor="jf-description">Job Description *</label>
+        <label className="form-label" htmlFor="jf-description">Role Description &amp; Responsibilities *</label>
         <textarea
           id="jf-description"
           className="form-textarea"
           name="description"
-          placeholder="Describe responsibilities, requirements, perks…"
+          placeholder="Describe the role responsibilities, ideal experience, company mission, perks…"
           value={form.description}
           onChange={handleChange}
           rows={6}
         />
-        {errors.description && <span className="form-error">{errors.description}</span>}
+        {errors.description && <span className="form-error">⚠️ {errors.description}</span>}
       </div>
 
       <button id="jf-submit" className="btn btn-primary btn-lg" type="submit" disabled={loading}>
-        {loading ? 'Saving…' : submitLabel}
+        {loading ? (
+          'Publishing…'
+        ) : (
+          <>
+            <PlusIcon size={16} />
+            <span>{submitLabel}</span>
+          </>
+        )}
       </button>
     </form>
   )
